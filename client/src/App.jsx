@@ -1,11 +1,10 @@
+import AppRouter from "./router/AppRouter"
 
 function App() {
 
   return (
     <>
-      <p className="text-5xl bg-amber-500">
-        Click on the Vite and React logos to learn more
-      </p>
+      <AppRouter />
     </>
   )
 }

@@ -11,8 +11,10 @@ const PORT = 5000;
 
 app.use(express.json());
 connect();
-app.use(cors());
-app.use(morgan('dev')); 
+app.use(cors({
+  origin: 'http://localhost:5173'
+}));
+app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.get("/", (req, res) => {
