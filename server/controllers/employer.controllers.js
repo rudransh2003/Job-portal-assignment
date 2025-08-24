@@ -23,10 +23,6 @@ export const createProfile = async(req, res) =>{
 }
 
 export const getProfile = async(req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
     try{
         const userId = req.user._id;
         const profile = await employerModel.findOne({ userId }).populate("postedJobs");

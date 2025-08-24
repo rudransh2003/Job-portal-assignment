@@ -4,18 +4,19 @@ import employerModel from '../models/employer.model.js'
 import jobModel from '../models/job.model.js'
 
 export const createJob = async (req, res) => {
-    const errors = validationResult(req)
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors.array() });
     }
+  
     try {
-        const employerId = req.user._id;
-        const job = await jobService.createJobService(employerId, req.body)
-        res.status(201).json(job);
+      const job = await jobService.createJobService(req.user._id, req.body);
+      res.status(201).json(job);
     } catch (err) {
-        res.status(400).json({ errors: err.message })
+      res.status(400).json({ message: err.message });
     }
-}
+  };
+  
 
 export const getEmployerJobs = async (req, res) => {
     const errors = validationResult(req)
@@ -68,9 +69,9 @@ export const deleteJob = async (req, res) => {
 export const getApplicantsForJob = async (req, res) => {
     try {
       const { jobId } = req.params;
-      const job1 = await jobModel.findById(jobId).populate("applications.seekerId");
-      // Does this return a full seeker document?
-      console.log(job1.applications[0].seekerId); 
+    //   const job1 = await jobModel.findById(jobId).populate("applications.seekerId");
+    //   // Does this return a full seeker document?
+    //   console.log(job1.applications[0].seekerId); 
       
       const job = await jobModel.findById(jobId)
         .populate({

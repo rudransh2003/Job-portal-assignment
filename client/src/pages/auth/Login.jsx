@@ -21,10 +21,35 @@ export default function Login() {
     e.preventDefault();
     dispatch(loginUser(formData)).then((res) => {
       if (res.meta.requestStatus === "fulfilled") {
-        const role = res.payload.user.role;
-        if (role === "admin") navigate("/admin/dashboard");
-        else if (role === "employer") navigate("/employer/view-jobs");
-        else navigate("/seeker/view-jobs");
+        const { role, isSuperAdmin } = res.payload.user;
+        
+        if (role === "admin") {
+          if (isSuperAdmin) {
+            navigate("/admin/dashboard");
+          } else {
+            // Handle case where someone tries to login as admin but isn't super admin
+            alert("Access denied. Super admin privileges required.");
+          }
+        } else if (role === "employer") {
+          navigate("/employer/view-jobs");
+        } else {
+          navigate("/seeker/view-jobs");
+        }
+      }
+    });
+  };
+
+  // Quick login function for super admin (for testing/development)
+  const handleSuperAdminLogin = () => {
+    const adminFormData = {
+      email: "rudranshadmin@gmail.com",
+      password: "12345678",
+      role: "admin"
+    };
+    
+    dispatch(loginUser(adminFormData)).then((res) => {
+      if (res.meta.requestStatus === "fulfilled") {
+        navigate("/admin/dashboard");
       }
     });
   };
@@ -43,9 +68,11 @@ export default function Login() {
               type="email"
               name="email"
               id="email"
+              value={formData.email}
               onChange={handleChange}
               className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your email"
+              required
             />
           </div>
 
@@ -57,9 +84,11 @@ export default function Login() {
               type="password"
               name="password"
               id="password"
+              value={formData.password}
               onChange={handleChange}
               className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your password"
+              required
             />
           </div>
 
@@ -70,6 +99,7 @@ export default function Login() {
             <select
               name="role"
               id="role"
+              value={formData.role}
               onChange={handleChange}
               className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -79,19 +109,45 @@ export default function Login() {
             </select>
           </div>
 
-          {error && <p className="text-red-500 mb-3">{error}</p>}
+          {error && (
+            <div className="mb-4 p-3 bg-red-900 border border-red-700 rounded">
+              <p className="text-red-300 text-sm">{error}</p>
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full p-3 rounded bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 rounded bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
+        {/* Quick Admin Login Button (for development/testing) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-4">
+            <button
+              onClick={handleSuperAdminLogin}
+              disabled={loading}
+              className="w-full p-2 rounded bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 text-sm"
+            >
+              Quick Super Admin Login (Dev Only)
+            </button>
+          </div>
+        )}
+
+        {/* Admin Login Notice */}
+        {formData.role === "admin" && (
+          <div className="mt-4 p-3 bg-yellow-900 border border-yellow-700 rounded">
+            <p className="text-yellow-300 text-sm">
+              ⚠️ Admin access requires super admin privileges
+            </p>
+          </div>
+        )}
+
         <p className="text-gray-400 mt-4">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <Link to="/register" className="text-blue-500 hover:underline">
             Register
           </Link>

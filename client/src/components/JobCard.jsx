@@ -5,6 +5,7 @@ import { applyJob, saveJob } from "../features/seeker/seekerJobSlice.js";
 const JobCard = ({ job, role = "seeker", isAppliedPage = false, onEdit, onDelete }) => {
     const dispatch = useDispatch();
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showDescription, setShowDescription] = useState(false);
 
     // Seeker handlers
     const handleApply = () => dispatch(applyJob(job._id));
@@ -16,11 +17,29 @@ const JobCard = ({ job, role = "seeker", isAppliedPage = false, onEdit, onDelete
         setShowDeleteConfirm(false);
     };
 
+    const isLongDescription = job.description && job.description.length > 120;
+
     return (
-        <div className="bg-gray-800 p-6 rounded-2xl shadow-md flex flex-col justify-between">
-            <div>
+        <div className="relative bg-gray-800 p-6 rounded-2xl shadow-md flex flex-col justify-between w-full max-w-md">
+            {/* Card body */}
+            <div className="flex-1">
                 <h3 className="text-xl font-semibold mb-2 text-white">{job.title}</h3>
-                <p className="text-gray-400 text-sm mb-2">{job.description}</p>
+
+                {/* Truncated description */}
+                <p className="text-gray-400 text-sm mb-2 line-clamp-2">
+                    {job.description}
+                </p>
+
+                {/* Read More link if description is long */}
+                {isLongDescription && (
+                    <button
+                        onClick={() => setShowDescription(true)}
+                        className="text-sm text-[#B85042] hover:underline"
+                    >
+                        Read More
+                    </button>
+                )}
+
                 <p className="text-gray-500 text-sm mb-1">
                     📍 {job.location} • 💰 {job.salary}
                 </p>
@@ -31,7 +50,7 @@ const JobCard = ({ job, role = "seeker", isAppliedPage = false, onEdit, onDelete
             </div>
 
             {/* Role-specific buttons */}
-            <div className="flex space-x-3 mt-4">
+            <div className="flex space-x-3 mt-4 relative z-30">
                 {role === "seeker" && (
                     <>
                         {!isAppliedPage && (
@@ -74,6 +93,27 @@ const JobCard = ({ job, role = "seeker", isAppliedPage = false, onEdit, onDelete
                     </span>
                 )}
             </div>
+
+            {/* Floating Description Dialog */}
+            {showDescription && (
+                <div className="absolute top-2 left-0 w-full z-40">
+                    <div className="bg-gray-900 text-white p-4 rounded-2xl shadow-lg border border-gray-700 relative">
+                        {/* Close button */}
+                        <button
+                            onClick={() => setShowDescription(false)}
+                            className="absolute top-2 right-2 text-gray-400 hover:text-white"
+                        >
+                            ✕
+                        </button>
+
+                        {/* Full Description */}
+                        <h4 className="text-lg font-semibold mb-2">{job.title}</h4>
+                        <p className="text-gray-300 text-sm max-h-48 overflow-y-auto pr-2">
+                            {job.description}
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (

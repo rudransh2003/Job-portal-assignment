@@ -6,6 +6,7 @@ import cors from 'cors';
 import authRoutes from './routes/auth.routes.js'
 import seekerRoutes from './routes/seeker.routes.js'
 import employerRoutes from './routes/employer.routes.js'
+import adminRoutes from './routes/admin.routes.js'
 const app = express();
 const PORT = 5000;
 
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 app.use('/auth', authRoutes)
 app.use("/seeker", seekerRoutes)
 app.use("/employer", employerRoutes)
+app.use("/admin", adminRoutes)
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

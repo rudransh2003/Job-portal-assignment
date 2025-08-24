@@ -101,7 +101,7 @@ export default function Register() {
             >
               <option value="seeker">Job Seeker</option>
               <option value="employer">Employer</option>
-              <option value="admin">Admin</option>
+              {/* <option value="admin">Admin</option> */}
             </select>
           </div>
 

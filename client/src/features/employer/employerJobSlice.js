@@ -56,7 +56,7 @@ export const deleteJob = createAsyncThunk(
   async (jobId, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete(`${API}/${jobId}`, {
+      const res = await axios.delete(`${API}/delete-job/${jobId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return { jobId, message: res.data.message };

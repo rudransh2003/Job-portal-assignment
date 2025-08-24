@@ -9,6 +9,7 @@ import EmployerProfile from "../pages/employer/EmployerProfile";
 import CreateJob from "../pages/employer/CreateJob";
 import AppliedJobs from "../pages/seeker/AppliedJobs";
 import ApplicationsPage from "../pages/employer/ApplicationsPage";
+import AdminDashboard from "../pages/admin/AdminDashboard";
 
 export default function AppRouter() {
     return (
@@ -69,6 +70,14 @@ export default function AppRouter() {
                     element={
                         <ProtectedRoute allowedRoles={["employer"]}>
                             <ApplicationsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/dashboard"
+                    element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                            <AdminDashboard />
                         </ProtectedRoute>
                     }
                 />

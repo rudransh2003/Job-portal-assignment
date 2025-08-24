@@ -202,10 +202,12 @@ export const getAppliedJobs = async (req, res) => {
             return res.status(404).json({ message: "Seeker profile not found" });
         }
 
-        const appliedJobs = seeker.appliedJobs.map((aj) => ({
-            ...aj.jobId._doc, // spread job fields
-            appliedAt: aj.appliedAt,
-        }));
+        const appliedJobs = seeker.appliedJobs
+            .filter(aj => aj.jobId) // filter out null jobId
+            .map(aj => ({
+                ...aj.jobId._doc, // spread job fields
+                appliedAt: aj.appliedAt,
+            }));
 
         res.status(200).json(appliedJobs);
     } catch (err) {
