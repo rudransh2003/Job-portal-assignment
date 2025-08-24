@@ -23,9 +23,6 @@ export default function Register() {
     dispatch(registerUser(formData));
   };
 
-//   function handleGoogleRegister() {
-//     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/users/google`;
-//   } 
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">

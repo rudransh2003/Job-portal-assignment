@@ -10,6 +10,7 @@ import CreateJob from "../pages/employer/CreateJob";
 import AppliedJobs from "../pages/seeker/AppliedJobs";
 import ApplicationsPage from "../pages/employer/ApplicationsPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
+import SavedJobs from "../pages/seeker/SavedJobs";
 
 export default function AppRouter() {
     return (
@@ -30,6 +31,14 @@ export default function AppRouter() {
                     element={
                         <ProtectedRoute allowedRoles={["seeker"]}>
                             <SeekerProfile />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/seeker/saved-jobs"
+                    element={
+                        <ProtectedRoute allowedRoles={["seeker"]}>
+                            <SavedJobs />
                         </ProtectedRoute>
                     }
                 />

@@ -3,10 +3,9 @@ import seekerModel from "../models/seeker.model.js";
 import employerModel from "../models/employer.model.js";
 import jobModel from "../models/job.model.js";
 
-// Middleware to check if user is super admin
 export const requireSuperAdmin = async (req, res, next) => {
     try {
-        const userId = req.user.id; // from JWT middleware
+        const userId = req.user.id; 
         const user = await userModel.findById(userId);
         
         if (!user || user.role !== 'admin' || !user.isSuperAdmin) {
@@ -21,7 +20,6 @@ export const requireSuperAdmin = async (req, res, next) => {
     }
 };
 
-// --- Manage Users ---
 export const getAllUsers = async (req, res) => {
     try {
         const users = await userModel.find({}, "-password");
@@ -40,15 +38,12 @@ export const banUser = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Prevent banning the super admin
         if (user.isSuperAdmin) {
             return res.status(403).json({ error: "Cannot ban the super admin" });
         }
 
-        // Delete user from db
         await userModel.findByIdAndDelete(userId);
 
-        // Also delete seeker/employer profile if exists
         await seekerModel.deleteOne({ userId });
         await employerModel.deleteOne({ userId });
 
@@ -58,15 +53,14 @@ export const banUser = async (req, res) => {
     }
 };
 
-// --- Manage Jobs ---
 export const getAllJobs = async (req, res) => {
     try {
         const jobs = await jobModel.find({})
             .populate({
-                path: 'employerId', // 1. Populate the employer document
+                path: 'employerId', 
                 populate: {
-                    path: 'userId', // 2. From the employer, populate the user document
-                    select: 'name email' // 3. Select only the name and email from the user
+                    path: 'userId', 
+                    select: 'name email' 
                 }
             });
             
@@ -89,7 +83,6 @@ export const removeJob = async (req, res) => {
     }
 };
 
-// --- View Statistics ---
 export const getStatistics = async (req, res) => {
     try {
         const totalJobs = await jobModel.countDocuments({});

@@ -1,3 +1,4 @@
+
 import employerModel from '../models/employer.model.js'
 import jobModel from '../models/job.model.js'
 import { validationResult } from 'express-validator'

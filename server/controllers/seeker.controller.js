@@ -30,7 +30,7 @@ export const getProfile = async (req, res) => {
 
         if (!profile) {
             console.log('No profile found for userId:', userId);
-            return res.status(404).json({ message: "Profile not found" });
+            return res.status(200).json(null);
         }
 
         console.log('Profile found:', profile);
@@ -72,20 +72,47 @@ export const updateProfile = async (req, res) => {
 
 export const viewJobs = async (req, res) => {
     try {
-        const seekerId = req.user._id; // from JWT auth middleware
+        const seekerId = req.user._id; 
         const seeker = await seekerModel.findOne({ userId: seekerId });
 
         if (!seeker) {
-            return res.status(404).json({ message: "Seeker profile not found" });
+            const { keyword, location, jobType, minSalary, maxSalary } = req.query;
+            let filters = {};
+
+            if (keyword) {
+                filters.$or = [
+                    { title: { $regex: keyword, $options: "i" } },
+                    { description: { $regex: keyword, $options: "i" } },
+                    { company: { $regex: keyword, $options: "i" } },
+                ];
+            }
+
+            if (location) {
+                filters.location = { $regex: location, $options: "i" };
+            }
+
+            if (jobType) {
+                filters.jobType = jobType;
+            }
+
+            if (minSalary || maxSalary) {
+                filters.salary = {};
+                if (minSalary) filters.salary.$gte = Number(minSalary);
+                if (maxSalary) filters.salary.$lte = Number(maxSalary);
+            }
+
+            const jobs = await jobModel.find(filters).sort({ createdAt: -1 });
+            return res.status(200).json(jobs);
         }
 
-        // Get all applied job IDs for this seeker
         const appliedJobIds = seeker.appliedJobs.map((aj) => aj.jobId.toString());
+        const savedJobIds = seeker.savedJobs.map((jobId) => jobId.toString());
+
+        const excludedJobIds = [...appliedJobIds, ...savedJobIds];
 
         const { keyword, location, jobType, minSalary, maxSalary } = req.query;
         let filters = {};
 
-        // Keyword search (title, description, company)
         if (keyword) {
             filters.$or = [
                 { title: { $regex: keyword, $options: "i" } },
@@ -94,27 +121,22 @@ export const viewJobs = async (req, res) => {
             ];
         }
 
-        // Location filter
         if (location) {
             filters.location = { $regex: location, $options: "i" };
         }
 
-        // Job Type filter
         if (jobType) {
             filters.jobType = jobType;
         }
 
-        // Salary range filter
         if (minSalary || maxSalary) {
             filters.salary = {};
             if (minSalary) filters.salary.$gte = Number(minSalary);
             if (maxSalary) filters.salary.$lte = Number(maxSalary);
         }
 
-        // Exclude applied jobs
-        filters._id = { $nin: appliedJobIds };
+        filters._id = { $nin: excludedJobIds };
 
-        // Query DB
         const jobs = await jobModel.find(filters).sort({ createdAt: -1 });
 
         res.status(200).json(jobs);
@@ -129,15 +151,12 @@ export const applyToJob = async (req, res) => {
         const userId = req.user._id || req.user.id;
         const { jobId } = req.params;
 
-        // Check if job exists
         const job = await jobModel.findById(jobId);
         if (!job) return res.status(404).json({ message: "Job not found" });
 
-        // Find seeker profile
         const seeker = await seekerModel.findOne({ userId: userId });
         if (!seeker) return res.status(404).json({ message: "Seeker profile not found" });
 
-        // Check if already applied
         const alreadyApplied = seeker.appliedJobs.some(
             (appliedJob) => appliedJob.jobId.toString() === jobId
         );
@@ -146,14 +165,15 @@ export const applyToJob = async (req, res) => {
             return res.status(400).json({ message: "Already applied to this job" });
         }
 
-        // Add to seeker's applied jobs
         seeker.appliedJobs.push({
             jobId: jobId,
             appliedAt: new Date()
         });
+
+        seeker.savedJobs = seeker.savedJobs.filter(savedJobId => savedJobId.toString() !== jobId);
+
         await seeker.save();
 
-        // Also add to job's applications array (for employer to see)
         job.applications.push({ seekerId: seeker._id });
         await job.save();
 
@@ -176,15 +196,22 @@ export const saveJob = async (req, res) => {
         const seeker = await seekerModel.findOne({ userId: seekerId });
         if (!seeker) return res.status(404).json({ message: "Seeker profile not found" });
 
-        // check if already saved
         if (seeker.savedJobs.includes(jobId)) {
             return res.status(400).json({ message: "Job already saved" });
+        }
+
+        const alreadyApplied = seeker.appliedJobs.some(
+            (appliedJob) => appliedJob.jobId.toString() === jobId
+        );
+        
+        if (alreadyApplied) {
+            return res.status(400).json({ message: "Cannot save job you've already applied to" });
         }
 
         seeker.savedJobs.push(jobId);
         await seeker.save();
 
-        res.status(200).json({ message: "Job saved successfully", seeker });
+        res.status(200).json({ message: "Job saved successfully", job });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -199,18 +226,55 @@ export const getAppliedJobs = async (req, res) => {
         });
 
         if (!seeker) {
-            return res.status(404).json({ message: "Seeker profile not found" });
+            return res.status(200).json([]);
         }
 
         const appliedJobs = seeker.appliedJobs
-            .filter(aj => aj.jobId) // filter out null jobId
+            .filter(aj => aj.jobId)
             .map(aj => ({
-                ...aj.jobId._doc, // spread job fields
+                ...aj.jobId._doc, 
                 appliedAt: aj.appliedAt,
             }));
 
         res.status(200).json(appliedJobs);
     } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getSavedJobs = async (req, res) => {
+    try {
+        const seekerId = req.user._id;
+        const seeker = await seekerModel.findOne({ userId: seekerId }).populate({
+            path: "savedJobs",
+            model: "job",
+        });
+
+        if (!seeker) {
+            return res.status(200).json([]);
+        }
+
+        res.status(200).json(seeker.savedJobs);
+    } catch (err) {
+        console.error("Error fetching saved jobs:", err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const unsaveJob = async (req, res) => {
+    try {
+        const seekerId = req.user._id;
+        const { jobId } = req.params;
+
+        const seeker = await seekerModel.findOne({ userId: seekerId });
+        if (!seeker) return res.status(404).json({ message: "Seeker profile not found" });
+
+        seeker.savedJobs = seeker.savedJobs.filter(id => id.toString() !== jobId);
+        await seeker.save();
+
+        res.status(200).json({ message: "Job unsaved successfully" });
+    } catch (err) {
+        console.error("Error unsaving job:", err);
         res.status(500).json({ error: err.message });
     }
 };

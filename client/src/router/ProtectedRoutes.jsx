@@ -9,7 +9,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   }
 
   if (!allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />; // redirect to homepage if not authorized
+    return <Navigate to="/" replace />; 
   }
 
   return children;

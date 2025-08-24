@@ -10,7 +10,6 @@ const createAxiosConfig = (token) => ({
   },
 });
 
-// Async thunks
 export const fetchAllJobs = createAsyncThunk(
   "admin/fetchAllJobs",
   async (_, { getState, rejectWithValue }) => {
@@ -116,7 +115,7 @@ const adminSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Fetch All Jobs
+  
     builder
       .addCase(fetchAllJobs.pending, (state) => {
         state.loading.jobs = true;
@@ -132,7 +131,7 @@ const adminSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Fetch All Users
+ 
     builder
       .addCase(fetchAllUsers.pending, (state) => {
         state.loading.users = true;
@@ -147,7 +146,7 @@ const adminSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Fetch Statistics
+   
     builder
       .addCase(fetchStatistics.pending, (state) => {
         state.loading.statistics = true;
@@ -162,7 +161,7 @@ const adminSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Remove Job
+   
     builder
       .addCase(removeJob.pending, (state) => {
         state.error = null;
@@ -176,7 +175,7 @@ const adminSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Ban User
+ 
     builder
       .addCase(banUser.pending, (state) => {
         state.error = null;
@@ -194,7 +193,6 @@ const adminSlice = createSlice({
 
 export const { clearError, setLoading } = adminSlice.actions;
 
-// Selectors
 export const selectJobs = (state) => state.admin.jobs;
 export const selectUsers = (state) => state.admin.users;
 export const selectStatistics = (state) => state.admin.statistics;

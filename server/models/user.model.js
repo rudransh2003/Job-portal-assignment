@@ -38,10 +38,8 @@ const userSchema = new mongoose.Schema({
 { timestamps: true }
 )
 
-// Pre-save hook to ensure only one super admin exists
 userSchema.pre('save', async function(next) {
     if (this.isSuperAdmin && this.role === 'admin') {
-        // Check if there's already a super admin and this isn't an update to the same user
         const existingSuperAdmin = await mongoose.model('user').findOne({ 
             isSuperAdmin: true, 
             _id: { $ne: this._id } 
@@ -78,19 +76,15 @@ userSchema.methods.generateJWT = function() {
     )
 }
 
-// Static method to create super admin
 userSchema.statics.createSuperAdmin = async function(adminData) {
     try {
-        // Check if super admin already exists
         const existingSuperAdmin = await this.findOne({ isSuperAdmin: true });
         if (existingSuperAdmin) {
             throw new Error('Super admin already exists in the system');
         }
 
-        // Hash password
         const hashedPassword = await this.hashPassword(adminData.password);
 
-        // Create super admin
         const superAdmin = new this({
             name: adminData.name,
             email: adminData.email,
@@ -106,7 +100,6 @@ userSchema.statics.createSuperAdmin = async function(adminData) {
     }
 };
 
-// Static method to get super admin
 userSchema.statics.getSuperAdmin = async function() {
     return await this.findOne({ isSuperAdmin: true });
 };

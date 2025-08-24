@@ -3,7 +3,6 @@ import axios from "axios";
 
 const API = `${import.meta.env.VITE_SERVER_URL}/employer`;
 
-// Fetch employer's posted jobs
 export const fetchEmployerJobs = createAsyncThunk(
   "employerJobs/fetchJobs",
   async (_, { rejectWithValue }) => {
@@ -19,7 +18,6 @@ export const fetchEmployerJobs = createAsyncThunk(
   }
 );
 
-// Create a new job
 export const createJob = createAsyncThunk(
   "employerJobs/createJob",
   async (jobData, { rejectWithValue }) => {
@@ -50,7 +48,7 @@ export const updateJob = createAsyncThunk(
   }
 );
 
-// Delete a job
+
 export const deleteJob = createAsyncThunk(
   "employerJobs/deleteJob",
   async (jobId, { rejectWithValue }) => {
@@ -120,7 +118,6 @@ const employerJobsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch jobs
       .addCase(fetchEmployerJobs.pending, (state) => { 
         state.loading = true; 
         state.error = null;
@@ -135,7 +132,6 @@ const employerJobsSlice = createSlice({
         state.error = action.payload;
       })
       
-      // Create job
       .addCase(createJob.pending, (state) => { 
         state.loading = true; 
         state.error = null;
@@ -150,7 +146,6 @@ const employerJobsSlice = createSlice({
         state.error = action.payload;
       })
       
-      // Update job
       .addCase(updateJob.pending, (state) => { 
         state.loading = true; 
         state.error = null;
@@ -168,7 +163,6 @@ const employerJobsSlice = createSlice({
         state.error = action.payload;
       })
       
-      // Delete job
       .addCase(deleteJob.pending, (state) => { 
         state.loading = true; 
         state.error = null;
@@ -189,19 +183,17 @@ const employerJobsSlice = createSlice({
       })
       .addCase(fetchApplicantsForJob.fulfilled, (state, action) => {
         state.loading = false;
-        state.applicants = action.payload; // applicants array
-        // state.selectedJob = action.payload.job;       // job details
+        state.applicants = action.payload; 
       })
       .addCase(fetchApplicantsForJob.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
     
-      // Update applicant status
       .addCase(updateApplicantStatus.fulfilled, (state, action) => {
         const updatedJob = action.payload.job;
         if (state.selectedJob && state.selectedJob._id === updatedJob._id) {
-          state.applicants = updatedJob.applications; // refresh applicants list
+          state.applicants = updatedJob.applications;
         }
       })
       .addCase(updateApplicantStatus.rejected, (state, action) => {

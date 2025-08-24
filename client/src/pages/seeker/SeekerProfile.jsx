@@ -2,92 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProfile, createProfile, updateProfile } from "../../features/seeker/seekerProfileSlice";
 import { useNavigate, useLocation } from "react-router-dom";
-
-const SeekerNavbar = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [activeTab, setActiveTab] = useState('profile');
-
-    const navItems = [
-        { id: 'dashboard', label: 'Dashboard', path: '/seeker/view-jobs', icon: '🏠' },
-        { id: 'profile', label: 'My Profile', path: '/seeker/profile', icon: '👤' },
-        { id: 'saved', label: 'Saved Jobs', path: '/seeker/saved-jobs', icon: '💾' },
-        { id: 'applied', label: 'Applied Jobs', path: '/seeker/applied-jobs', icon: '📝' },
-    ];
-
-    useEffect(() => {
-        // Set active tab based on current path
-        const currentItem = navItems.find(item => item.path === location.pathname);
-        if (currentItem) {
-            setActiveTab(currentItem.id);
-        }
-    }, [location.pathname]);
-
-    const handleNavigation = (item) => {
-        setActiveTab(item.id);
-        navigate(item.path);
-    };
-
-    return (
-        <nav className="bg-gray-800 border-b border-gray-700 mb-6">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="flex items-center justify-between h-16">
-                    {/* Logo/Brand */}
-                    <div className="flex items-center">
-                        <h2 className="text-xl font-bold text-white">JobSeeker</h2>
-                    </div>
-
-                    {/* Navigation Items */}
-                    <div className="hidden md:flex space-x-1">
-                        {navItems.map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => handleNavigation(item)}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                                    activeTab === item.id
-                                        ? 'bg-[#B85042] text-white shadow-lg'
-                                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                                }`}
-                            >
-                                <span>{item.icon}</span>
-                                <span>{item.label}</span>
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Mobile Menu Button */}
-                    <div className="md:hidden">
-                        <button className="text-gray-300 hover:text-white p-2">
-                            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Mobile Navigation */}
-                <div className="md:hidden pb-4">
-                    <div className="flex flex-wrap gap-2">
-                        {navItems.map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => handleNavigation(item)}
-                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                                    activeTab === item.id
-                                        ? 'bg-[#B85042] text-white'
-                                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                                }`}
-                            >
-                                <span>{item.icon}</span>
-                                <span>{item.label}</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </nav>
-    );
-};
+import Navbar from "../../components/Navbar";
 
 const SeekerProfile = () => {
     const dispatch = useDispatch();
@@ -146,10 +61,8 @@ const SeekerProfile = () => {
             } else {
                 await dispatch(createProfile(payload)).unwrap();
             }
-            // Navigate to dashboard after successful submission
             navigate('/seeker/view-jobs');
         } catch (err) {
-            // Error is handled by Redux, just stay on the page
             console.error('Profile operation failed:', err);
         }
     };
@@ -157,12 +70,10 @@ const SeekerProfile = () => {
     const renderError = () => {
         if (!error) return null;
         
-        // Don't show error if it's just that profile doesn't exist yet
         if (error.message === "Profile not found" || error.status === 404) {
             return null;
         }
         
-        // Handle different error formats
         if (typeof error === 'string') {
             return (
                 <div className="mb-6 p-4 bg-red-900 border border-red-700 rounded-lg">
@@ -192,10 +103,9 @@ const SeekerProfile = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 text-white">
-            <SeekerNavbar />
+            <Navbar role="seeker"/>
             
             <div className="max-w-4xl mx-auto p-4">
-                {/* Header Section */}
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold mb-2">
                         {profile ? "Update Profile" : "Create Profile"}
@@ -208,7 +118,6 @@ const SeekerProfile = () => {
                     </p>
                 </div>
 
-                {/* Loading State */}
                 {loading && (
                     <div className="mb-6 p-4 bg-blue-900 border border-blue-700 rounded-lg">
                         <div className="flex items-center space-x-3">
@@ -218,13 +127,10 @@ const SeekerProfile = () => {
                     </div>
                 )}
 
-                {/* Error Display */}
                 {renderError()}
 
-                {/* Profile Form */}
                 <div className="bg-gray-800 rounded-lg shadow-xl border border-gray-700">
                     <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                        {/* Skills Section */}
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Skills (comma separated)
@@ -239,7 +145,6 @@ const SeekerProfile = () => {
                             />
                         </div>
 
-                        {/* Experience Section */}
                         <div className="bg-gray-750 p-4 rounded-lg border border-gray-600">
                             <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
                                 <svg className="h-5 w-5 mr-2 text-[#B85042]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,7 +216,6 @@ const SeekerProfile = () => {
                             </div>
                         </div>
                         
-                        {/* Additional Info */}
                         <div className="grid gap-6 md:grid-cols-2">
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -343,7 +247,6 @@ const SeekerProfile = () => {
                             </div>
                         </div>
 
-                        {/* Submit Button */}
                         <div className="pt-4">
                             <button 
                                 type="submit" 
@@ -363,7 +266,6 @@ const SeekerProfile = () => {
                     </form>
                 </div>
 
-                {/* Back to Dashboard Link */}
                 <div className="mt-6 text-center">
                     <button
                         onClick={() => navigate('/seeker/view-jobs')}

@@ -7,11 +7,9 @@ const JobCard = ({ job, role = "seeker", isAppliedPage = false, onEdit, onDelete
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showDescription, setShowDescription] = useState(false);
 
-    // Seeker handlers
     const handleApply = () => dispatch(applyJob(job._id));
     const handleSave = () => dispatch(saveJob(job._id));
 
-    // Employer handler
     const handleDelete = () => {
         if (onDelete) onDelete(job._id);
         setShowDeleteConfirm(false);
@@ -21,16 +19,15 @@ const JobCard = ({ job, role = "seeker", isAppliedPage = false, onEdit, onDelete
 
     return (
         <div className="relative bg-gray-800 p-6 rounded-2xl shadow-md flex flex-col justify-between w-full max-w-md">
-            {/* Card body */}
+      
             <div className="flex-1">
                 <h3 className="text-xl font-semibold mb-2 text-white">{job.title}</h3>
 
-                {/* Truncated description */}
+               
                 <p className="text-gray-400 text-sm mb-2 line-clamp-2">
                     {job.description}
                 </p>
 
-                {/* Read More link if description is long */}
                 {isLongDescription && (
                     <button
                         onClick={() => setShowDescription(true)}
@@ -49,7 +46,6 @@ const JobCard = ({ job, role = "seeker", isAppliedPage = false, onEdit, onDelete
                 </p>
             </div>
 
-            {/* Role-specific buttons */}
             <div className="flex space-x-3 mt-4 relative z-30">
                 {role === "seeker" && (
                     <>
@@ -94,7 +90,6 @@ const JobCard = ({ job, role = "seeker", isAppliedPage = false, onEdit, onDelete
                 )}
             </div>
 
-            {/* Floating Description Dialog */}
             {showDescription && (
                 <div className="absolute top-2 left-0 w-full z-40">
                     <div className="bg-gray-900 text-white p-4 rounded-2xl shadow-lg border border-gray-700 relative">
@@ -115,7 +110,6 @@ const JobCard = ({ job, role = "seeker", isAppliedPage = false, onEdit, onDelete
                 </div>
             )}
 
-            {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 max-w-md w-full mx-4">

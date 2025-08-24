@@ -19,7 +19,6 @@ const JobForm = ({
         expiry_date: "",
     });
 
-    // Prefill when editing
     useEffect(() => {
         if (mode === "update" && initialData) {
             setFormData({
@@ -52,7 +51,7 @@ const JobForm = ({
             salary: formData.salary ? Number(formData.salary) : undefined,
         };
 
-        onSubmit(jobData); // delegate to parent (create or update)
+        onSubmit(jobData); 
     };
 
     const jobTypeOptions = ["Full-time", "Part-time", "Remote"];
@@ -67,7 +66,6 @@ const JobForm = ({
 
     return (
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* Error Display */}
             {error && (
                 <div className="p-4 bg-red-900 border border-red-700 rounded-lg">
                     <p className="text-red-300">
@@ -76,7 +74,6 @@ const JobForm = ({
                 </div>
             )}
 
-            {/* Basic Job Information */}
             <div className="bg-gray-750 p-4 rounded-lg border border-gray-600">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
                     <svg className="h-5 w-5 mr-2 text-[#B85042]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,7 +157,6 @@ const JobForm = ({
                 </div>
             </div>
 
-            {/* Compensation & Skills */}
             <div className="bg-gray-750 p-4 rounded-lg border border-gray-600">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
                     <svg className="h-5 w-5 mr-2 text-[#B85042]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,7 +208,6 @@ const JobForm = ({
                 </div>
             </div>
 
-            {/* Submit Buttons */}
             <div className="pt-4 flex justify-end gap-3">
                 {onCancel && (
                     <button

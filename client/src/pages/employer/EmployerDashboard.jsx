@@ -35,11 +35,16 @@ const EmployerDashboard = () => {
 
     const renderError = () => {
         if (!error) return null;
+        const errorMessage = typeof error === 'string' ? error : error.message || 'Something went wrong';
+        if (errorMessage.toLowerCase().includes('not found') || 
+            errorMessage.toLowerCase().includes('404')) {
+            return null;
+        }
 
         return (
             <div className="mb-6 p-4 bg-red-900 border border-red-700 rounded-lg">
                 <p className="text-red-300">
-                    {typeof error === 'string' ? error : error.message || 'Something went wrong'}
+                    {errorMessage}
                 </p>
             </div>
         );
@@ -49,13 +54,11 @@ const EmployerDashboard = () => {
         <div className="min-h-screen bg-gray-900 text-white">
             <Navbar role="employer" />
             <div className="max-w-7xl mx-auto p-4">
-                {/* Header Section */}
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold mb-2">Employer Dashboard</h1>
                     <p className="text-gray-400">Manage your job postings and find the best candidates</p>
                 </div>
 
-                {/* Profile Completion Alert - Only show when profileComplete is explicitly false */}
                 {profileComplete === false && (
                     <div className="mb-6 p-4 bg-gradient-to-r from-[#B85042] to-red-700 rounded-lg border-l-4 border-red-500">
                         <div className="flex items-center justify-between">
@@ -80,10 +83,8 @@ const EmployerDashboard = () => {
                     </div>
                 )}
 
-                {/* Error Display */}
                 {renderError()}
 
-                {/* Quick Actions */}
                 <div className="mb-6 flex flex-wrap gap-4">
                     <button
                         onClick={() => navigate('/employer/create-job')}
@@ -94,7 +95,6 @@ const EmployerDashboard = () => {
                     </button>
                 </div>
 
-                {/* Jobs Section */}
                 <div className="mb-4 flex items-center justify-between">
                     <h2 className="text-xl font-semibold">Your Posted Jobs</h2>
                     {jobs.length > 0 && (

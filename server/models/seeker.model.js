@@ -17,7 +17,7 @@ const seekerSchema = new mongoose.Schema(
       role: { type: String },
       description: { type: String },
       startDate: { type: Date },
-      endDate: { type: Date }, // null if ongoing
+      endDate: { type: Date }, 
     },
     experienceYears: {
       type: Number,

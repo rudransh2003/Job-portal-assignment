@@ -62,7 +62,6 @@ const authSlice = createSlice({
       state.error = action.payload;
     });
 
-    // Login
     builder.addCase(loginUser.pending, (state) => {
       state.loading = true;
       state.error = null;

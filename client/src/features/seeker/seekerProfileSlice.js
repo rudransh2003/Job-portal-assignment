@@ -3,11 +3,9 @@ import axios from "axios";
 
 const API = `${import.meta.env.VITE_SERVER_URL}/seeker/profile`;
 
-// Helper function to check if profile is complete
 const isProfileComplete = (profile) => {
     if (!profile) return false;
     
-    // Check if essential fields are filled
     const hasSkills = profile.skills && profile.skills.length > 0;
     const hasExperience = profile.experience && profile.experience.company && profile.experience.role;
     const hasExperienceYears = profile.experienceYears !== undefined && profile.experienceYears >= 0;
@@ -25,16 +23,14 @@ export const fetchProfile = createAsyncThunk(
       });
       return res.data;
     } catch (err) {
-      // Handle 404 specifically - profile doesn't exist yet
       if (err.response?.status === 404) {
-        return null; // Return null instead of rejecting for 404
+        return null; 
       }
       return rejectWithValue(err.response?.data || { message: "Failed to fetch profile" });
     }
   }
 );
 
-// Create profile
 export const createProfile = createAsyncThunk(
   "seeker/createProfile",
   async (profileData, { rejectWithValue }) => {
@@ -50,7 +46,6 @@ export const createProfile = createAsyncThunk(
   }
 );
 
-// Update profile
 export const updateProfile = createAsyncThunk(
   "seeker/updateProfile",
   async (profileData, { rejectWithValue }) => {
@@ -74,7 +69,7 @@ const seekerProfileSlice = createSlice({
     error: null,
     profileExists: false,
     profileComplete: false,
-    hasShownIncompleteAlert: false, // Track if we've already shown the alert for incomplete profile
+    hasShownIncompleteAlert: false, 
   },
   reducers: {
     clearError: (state) => {
@@ -86,7 +81,6 @@ const seekerProfileSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch profile
       .addCase(fetchProfile.pending, (state) => { 
         state.loading = true; 
         state.error = null;
@@ -110,7 +104,6 @@ const seekerProfileSlice = createSlice({
         state.profileComplete = false;
       })
       
-      // Create profile
       .addCase(createProfile.pending, (state) => { 
         state.loading = true; 
         state.error = null;
@@ -123,7 +116,6 @@ const seekerProfileSlice = createSlice({
         state.profileComplete = isProfileComplete(action.payload);
         state.error = null;
         
-        // Reset alert flag when profile becomes complete or if it was complete and now incomplete
         if (state.profileComplete || (previouslyComplete && !state.profileComplete)) {
           state.hasShownIncompleteAlert = false;
         }
@@ -133,7 +125,6 @@ const seekerProfileSlice = createSlice({
         state.error = action.payload;
       })
       
-      // Update profile
       .addCase(updateProfile.pending, (state) => { 
         state.loading = true; 
         state.error = null;
@@ -145,7 +136,6 @@ const seekerProfileSlice = createSlice({
         state.profileComplete = isProfileComplete(action.payload);
         state.error = null;
         
-        // Reset alert flag when profile becomes complete or if it was complete and now incomplete
         if (state.profileComplete || (previouslyComplete && !state.profileComplete)) {
           state.hasShownIncompleteAlert = false;
         }

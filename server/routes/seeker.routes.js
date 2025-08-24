@@ -40,4 +40,16 @@ router.post('/save/:jobId',
     authorizeRole("seeker"),
     seekerController.saveJob)
 
+router.get('/saved-jobs',
+    authenticate,
+    authorizeRole("seeker"),
+    seekerController.getSavedJobs
+)
+
+router.delete('/unsave/:jobId',
+    authenticate,
+    authorizeRole("seeker"),
+    seekerController.unsaveJob
+)
+
 export default router

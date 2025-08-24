@@ -34,7 +34,6 @@ const CreateJob = () => {
         e.preventDefault();
 
         try {
-            // Convert skills string to array
             const skillsArray = formData.skills
                 ? formData.skills.split(',').map(skill => skill.trim()).filter(skill => skill.length > 0)
                 : [];
@@ -46,7 +45,6 @@ const CreateJob = () => {
             };
 
             await dispatch(createJob(jobData)).unwrap();
-            // Navigate to dashboard after successful creation
             navigate('/employer/view-jobs');
         } catch (err) {
             console.error('Job creation failed:', err);
@@ -92,7 +90,6 @@ const CreateJob = () => {
             <Navbar role="employer" />
 
             <div className="max-w-4xl mx-auto p-4">
-                {/* Header Section */}
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold mb-2">Create New Job Posting</h1>
                     <p className="text-gray-400">
@@ -100,7 +97,6 @@ const CreateJob = () => {
                     </p>
                 </div>
 
-                {/* Loading State */}
                 {loading && (
                     <div className="mb-6 p-4 bg-blue-900 border border-blue-700 rounded-lg">
                         <div className="flex items-center space-x-3">
@@ -110,10 +106,8 @@ const CreateJob = () => {
                     </div>
                 )}
 
-                {/* Error Display */}
                 {renderError()}
 
-                {/* Job Creation Form */}
                 <div className="bg-gray-800 rounded-lg shadow-xl border border-gray-700">
                     <form onSubmit={handleSubmit} className="p-6 space-y-6">
                         {/* Basic Job Information */}
@@ -200,7 +194,6 @@ const CreateJob = () => {
                             </div>
                         </div>
 
-                        {/* Compensation & Skills */}
                         <div className="bg-gray-750 p-4 rounded-lg border border-gray-600">
                             <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
                                 <svg className="h-5 w-5 mr-2 text-[#B85042]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -252,7 +245,6 @@ const CreateJob = () => {
                             </div>
                         </div>
 
-                        {/* Submit Button */}
                         <div className="pt-4">
                             <button
                                 type="submit"
@@ -272,7 +264,6 @@ const CreateJob = () => {
                     </form>
                 </div>
 
-                {/* Back to Dashboard Link */}
                 <div className="mt-6 text-center">
                     <button
                         onClick={() => navigate('/employer/view-jobs')}

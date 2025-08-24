@@ -12,20 +12,16 @@ import {
   selectError,
   selectLastUpdated
 } from '../../features/admin/adminJobSlice.js';
-// The Filters component is no longer needed as we integrated it directly
-// import Filters from '../../components/Filters.jsx';
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
 
-  // Redux state
   const jobs = useSelector(selectJobs);
   const statistics = useSelector(selectStatistics);
   const loading = useSelector(selectLoading);
   const error = useSelector(selectError);
   const lastUpdated = useSelector(selectLastUpdated);
 
-  // Local state for filters and modal
   const [filters, setFilters] = useState({
     keyword: '',
     location: '',
@@ -36,37 +32,26 @@ const AdminDashboard = () => {
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
 
-  // Initial data fetch
   useEffect(() => {
     dispatch(fetchAllJobs());
     dispatch(fetchStatistics());
   }, [dispatch]);
-
-  // This useEffect now handles all filtering logic whenever jobs or filters change
   useEffect(() => {
     let newFilteredJobs = [...jobs];
-
-    // Keyword filter on title or company
     if (filters.keyword) {
       newFilteredJobs = newFilteredJobs.filter(job =>
         job.title?.toLowerCase().includes(filters.keyword.toLowerCase()) ||
         job.company?.toLowerCase().includes(filters.keyword.toLowerCase())
       );
     }
-
-    // Location filter
     if (filters.location) {
       newFilteredJobs = newFilteredJobs.filter(job =>
         job.location?.toLowerCase().includes(filters.location.toLowerCase())
       );
     }
-
-    // Job Type filter
     if (filters.jobType && filters.jobType !== 'All Types') {
       newFilteredJobs = newFilteredJobs.filter(job => job.jobType === filters.jobType);
     }
-
-    // Salary range filter (handles min, max, or both)
     const minSal = parseFloat(filters.minSalary);
     const maxSal = parseFloat(filters.maxSalary);
 
@@ -106,28 +91,21 @@ const AdminDashboard = () => {
     );
   };
 
-  // REFACTORED: Handles unpopulated employerId object
- // This now prioritizes Company Name and correctly reads the nested user data
 const getEmployerName = (job) => {
     if (!job.employerId) return 'N/A (No Employer)';
     
-    // Use companyName from the employer model first
     if (job.employerId.companyName) return job.employerId.companyName;
   
-    // Fallback to the user's name from the nested userId object
     if (job.employerId.userId?.name) return job.employerId.userId.name;
   
     return 'Unspecified Employer';
   };
   
-  // This now reads the nested user email correctly
   const getEmployerEmail = (job) => {
     if (!job.employerId) return '---';
   
-    // Use contactEmail from the employer model first
     if (job.employerId.contactEmail) return job.employerId.contactEmail;
     
-    // Fallback to the user's email from the nested userId object
     if (job.employerId.userId?.email) return job.employerId.userId.email;
   
     return 'Email not available';
@@ -149,7 +127,6 @@ const getEmployerName = (job) => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-0">
         <div>
           <h1 className="text-2xl font-bold">Admin Dashboard</h1>
@@ -165,7 +142,6 @@ const getEmployerName = (job) => {
         </button>
       </div>
 
-      {/* Error */}
       {error && (
         <div className="mx-6 mt-6 p-4 bg-red-900 border border-red-700 rounded-lg flex justify-between">
           <p className="text-red-300">{error}</p>
@@ -173,7 +149,6 @@ const getEmployerName = (job) => {
         </div>
       )}
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-6">
         <StatCard title="Total Jobs" value={statistics.totalJobs} icon={<Search size={24} />} />
         <StatCard title="Active Jobs" value={activeJobsCount} icon={<Calendar size={24} />} />
@@ -181,7 +156,6 @@ const getEmployerName = (job) => {
         <StatCard title="Total Applications" value={statistics.totalApplications} icon={<User size={24} />} />
       </div>
 
-      {/* --- REFACTORED FILTERS UI --- */}
       <div className="px-6 pb-6">
         <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -193,8 +167,6 @@ const getEmployerName = (job) => {
         </div>
       </div>
 
-
-      {/* Jobs Table */}
       <div className="px-6 pb-6">
         <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-x-auto">
           <table className="w-full min-w-max">
@@ -241,7 +213,6 @@ const getEmployerName = (job) => {
         </div>
       </div>
 
-      {/* Job Details Modal */}
       {selectedJob && (
         <JobDetailsModal job={selectedJob} onClose={() => setSelectedJob(null)} getStatusBadge={getStatusBadge} formatDate={formatDate} getEmployerName={getEmployerName} getEmployerEmail={getEmployerEmail} />
       )}
@@ -249,7 +220,6 @@ const getEmployerName = (job) => {
   );
 };
 
-// --- Reusable Components (can be moved to their own files) ---
 
 const StatCard = ({ title, value, icon }) => (
   <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 flex justify-between items-center">

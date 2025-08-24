@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAppliedJobs } from "../../features/seeker/seekerJobSlice.js";
 // import SeekerNavbar from "./SeekerNavbar";
 import JobCard from "../../components/JobCard.jsx"
+import Navbar from "../../components/Navbar.jsx";
 
 const AppliedJobs = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const AppliedJobs = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* <SeekerNavbar /> */}
+      <Navbar role="seeker" />
       <div className="max-w-7xl mx-auto p-4">
         <h1 className="text-3xl font-bold mb-6">Applied Jobs</h1>
 

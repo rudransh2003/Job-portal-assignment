@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchEmployerProfile, createEmployerProfile, updateEmployerProfile } from "../../features/employer/employerProfileSlice";
 import { useNavigate, useLocation } from "react-router-dom";
 
-// Reusable Employer Navbar Component
 const EmployerNavbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -17,7 +16,6 @@ const EmployerNavbar = () => {
     ];
 
     useEffect(() => {
-        // Set active tab based on current path
         const currentItem = navItems.find(item => item.path === location.pathname);
         if (currentItem) {
             setActiveTab(currentItem.id);
@@ -33,12 +31,9 @@ const EmployerNavbar = () => {
         <nav className="bg-gray-800 border-b border-gray-700 mb-6">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
-                    {/* Logo/Brand */}
                     <div className="flex items-center">
                         <h2 className="text-xl font-bold text-white">JobEmployer</h2>
                     </div>
-
-                    {/* Navigation Items */}
                     <div className="hidden md:flex space-x-1">
                         {navItems.map((item) => (
                             <button
@@ -56,7 +51,6 @@ const EmployerNavbar = () => {
                         ))}
                     </div>
 
-                    {/* Mobile Menu Button */}
                     <div className="md:hidden">
                         <button className="text-gray-300 hover:text-white p-2">
                             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +60,6 @@ const EmployerNavbar = () => {
                     </div>
                 </div>
 
-                {/* Mobile Navigation */}
                 <div className="md:hidden pb-4">
                     <div className="flex flex-wrap gap-2">
                         {navItems.map((item) => (
@@ -132,10 +125,8 @@ const EmployerProfile = () => {
             } else {
                 await dispatch(createEmployerProfile(formData)).unwrap();
             }
-            // Navigate to dashboard after successful submission
             navigate('/employer/view-jobs');
         } catch (err) {
-            // Error is handled by Redux, just stay on the page
             console.error('Profile operation failed:', err);
         }
     };
@@ -143,12 +134,10 @@ const EmployerProfile = () => {
     const renderError = () => {
         if (!error) return null;
         
-        // Don't show error if it's just that profile doesn't exist yet
         if (error.message === "Profile not found" || error.status === 404) {
             return null;
         }
         
-        // Handle different error formats
         if (typeof error === 'string') {
             return (
                 <div className="mb-6 p-4 bg-red-900 border border-red-700 rounded-lg">
@@ -181,7 +170,6 @@ const EmployerProfile = () => {
             <EmployerNavbar />
             
             <div className="max-w-4xl mx-auto p-4">
-                {/* Header Section */}
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold mb-2">
                         {profile ? "Update Company Profile" : "Create Company Profile"}
@@ -194,7 +182,6 @@ const EmployerProfile = () => {
                     </p>
                 </div>
 
-                {/* Loading State */}
                 {loading && (
                     <div className="mb-6 p-4 bg-blue-900 border border-blue-700 rounded-lg">
                         <div className="flex items-center space-x-3">
@@ -204,13 +191,10 @@ const EmployerProfile = () => {
                     </div>
                 )}
 
-                {/* Error Display */}
                 {renderError()}
 
-                {/* Profile Form */}
                 <div className="bg-gray-800 rounded-lg shadow-xl border border-gray-700">
                     <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                        {/* Basic Company Information */}
                         <div className="bg-gray-750 p-4 rounded-lg border border-gray-600">
                             <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
                                 <svg className="h-5 w-5 mr-2 text-[#B85042]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,7 +255,6 @@ const EmployerProfile = () => {
                             </div>
                         </div>
                         
-                        {/* Contact Information */}
                         <div className="bg-gray-750 p-4 rounded-lg border border-gray-600">
                             <h2 className="text-lg font-semibold text-white mb-4 flex items-center">
                                 <svg className="h-5 w-5 mr-2 text-[#B85042]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,7 +276,6 @@ const EmployerProfile = () => {
                             </div>
                         </div>
 
-                        {/* Submit Button */}
                         <div className="pt-4">
                             <button 
                                 type="submit" 
@@ -313,7 +295,6 @@ const EmployerProfile = () => {
                     </form>
                 </div>
 
-                {/* Back to Dashboard Link */}
                 <div className="mt-6 text-center">
                     <button
                         onClick={() => navigate('/employer/view-jobs')}

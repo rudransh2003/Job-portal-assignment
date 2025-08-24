@@ -3,6 +3,7 @@ import axios from "axios";
 
 const API_BASE = `${import.meta.env.VITE_SERVER_URL}/seeker`;
 
+
 export const fetchJobs = createAsyncThunk(
   "seeker/fetchJobs",
   async (filters = {}, { rejectWithValue }) => {
@@ -33,7 +34,7 @@ export const applyJob = createAsyncThunk(
         {
           headers: {
             Authorization: `Bearer ${token}`,
-          }
+          },
         }
       );
       return { jobId, data: res.data };
@@ -54,10 +55,10 @@ export const saveJob = createAsyncThunk(
         {
           headers: {
             Authorization: `Bearer ${token}`,
-          }
+          },
         }
       );
-      return res.data;
+      return res.data.job;
     } catch (err) {
       return rejectWithValue(err.response?.data || "Failed to save job");
     }
@@ -72,14 +73,43 @@ export const fetchAppliedJobs = createAsyncThunk(
       const res = await axios.get(`${API_BASE}/applied-jobs`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Applied jobs response:", res.data); // Debug log
       return res.data;
     } catch (err) {
-      console.error("Error fetching applied jobs:", err.response?.data);
       return rejectWithValue(err.response?.data || "Error fetching applied jobs");
     }
   }
 );
+
+export const fetchSavedJobs = createAsyncThunk(
+  "seeker/fetchSavedJobs",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API_BASE}/saved-jobs`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Error fetching saved jobs");
+    }
+  }
+);
+
+export const unsaveJob = createAsyncThunk(
+  "seeker/unsaveJob",
+  async (jobId, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_BASE}/unsave/${jobId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return jobId;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Failed to unsave job");
+    }
+  }
+);
+
 
 const seekerJobSlice = createSlice({
   name: "seeker",
@@ -113,8 +143,7 @@ const seekerJobSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Failed to fetch jobs";
       })
-      
-      // Apply job cases
+
       .addCase(applyJob.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -122,59 +151,85 @@ const seekerJobSlice = createSlice({
       .addCase(applyJob.fulfilled, (state, action) => {
         state.loading = false;
         const jobId = action.payload.jobId;
+      
+        let appliedJob = state.jobs.find(job => job._id === jobId);
         
-        // Find the job in the current list
-        const appliedJob = state.jobs.find(job => job._id === jobId);
-        
+        if (!appliedJob) {
+          appliedJob = state.savedJobs.find(job => job._id === jobId);
+        }
+      
         if (appliedJob) {
-          // Add to applied jobs list with appliedAt timestamp
           const appliedJobWithStatus = {
             ...appliedJob,
             appliedAt: new Date().toISOString()
           };
-          
-          // Check if already in applied jobs to avoid duplicates
+      
           const alreadyInApplied = state.appliedJobs.some(job => job._id === jobId);
           if (!alreadyInApplied) {
             state.appliedJobs.push(appliedJobWithStatus);
           }
-
-          // Remove from available jobs list immediately
-          state.jobs = state.jobs.filter(job => job._id !== jobId);
         }
-      })
+      
+        state.jobs = state.jobs.filter(job => job._id !== jobId);
+        state.savedJobs = state.savedJobs.filter(job => job._id !== jobId);
+      })      
       .addCase(applyJob.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to apply to job";
       })
-      
-      // Fetch applied jobs cases
+
       .addCase(fetchAppliedJobs.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchAppliedJobs.fulfilled, (state, action) => {
         state.loading = false;
-        // The controller returns an array of jobs with appliedAt field
         state.appliedJobs = action.payload;
-        console.log("Applied jobs set to:", action.payload); // Debug log
       })
       .addCase(fetchAppliedJobs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch applied jobs";
-        console.error("Fetch applied jobs error:", action.payload);
       })
-      
-      // Save job cases
+
       .addCase(saveJob.pending, (state) => {
         state.error = null;
       })
       .addCase(saveJob.fulfilled, (state, action) => {
-        // Add to saved jobs but keep in main jobs list
-        state.savedJobs.push(action.payload);
-      })
+        const job = action.payload;
+      
+        const alreadyApplied = state.appliedJobs.some(j => j._id === job._id);
+        if (alreadyApplied) return;
+      
+        const alreadySaved = state.savedJobs.some(j => j._id === job._id);
+        if (!alreadySaved) {
+          state.savedJobs.push(job);
+        }
+
+        state.jobs = state.jobs.filter(j => j._id !== job._id);
+      })      
       .addCase(saveJob.rejected, (state, action) => {
         state.error = action.payload || "Failed to save job";
+      })
+
+      .addCase(fetchSavedJobs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSavedJobs.fulfilled, (state, action) => {
+        state.loading = false;
+        state.savedJobs = action.payload;
+      })
+      .addCase(fetchSavedJobs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch saved jobs";
+      })
+
+      .addCase(unsaveJob.fulfilled, (state, action) => {
+        const jobId = action.payload;
+        state.savedJobs = state.savedJobs.filter(job => job._id !== jobId);
+      })
+      .addCase(unsaveJob.rejected, (state, action) => {
+        state.error = action.payload || "Failed to unsave job";
       });
   },
 });

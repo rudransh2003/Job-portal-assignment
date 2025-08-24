@@ -6,14 +6,12 @@ dotenv.config();
 
 export const createInitialSuperAdmin = async () => {
     try {
-        // Check if super admin already exists
         const existingSuperAdmin = await User.getSuperAdmin();
         if (existingSuperAdmin) {
             console.log('Super admin already exists:', existingSuperAdmin.email);
             return existingSuperAdmin;
         }
 
-        // Create super admin with credentials from environment variables
         const superAdminData = {
             name: process.env.SUPER_ADMIN_NAME || 'Super Admin',
             email: process.env.SUPER_ADMIN_EMAIL || 'admin@yourwebsite.com',

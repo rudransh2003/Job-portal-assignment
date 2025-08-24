@@ -11,7 +11,7 @@ export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: "seeker", // default
+    role: "seeker", 
   });
 
   const handleChange = (e) =>
@@ -27,7 +27,6 @@ export default function Login() {
           if (isSuperAdmin) {
             navigate("/admin/dashboard");
           } else {
-            // Handle case where someone tries to login as admin but isn't super admin
             alert("Access denied. Super admin privileges required.");
           }
         } else if (role === "employer") {
@@ -35,21 +34,6 @@ export default function Login() {
         } else {
           navigate("/seeker/view-jobs");
         }
-      }
-    });
-  };
-
-  // Quick login function for super admin (for testing/development)
-  const handleSuperAdminLogin = () => {
-    const adminFormData = {
-      email: "rudranshadmin@gmail.com",
-      password: "12345678",
-      role: "admin"
-    };
-    
-    dispatch(loginUser(adminFormData)).then((res) => {
-      if (res.meta.requestStatus === "fulfilled") {
-        navigate("/admin/dashboard");
       }
     });
   };
@@ -124,7 +108,6 @@ export default function Login() {
           </button>
         </form>
 
-        {/* Admin Login Notice */}
         {formData.role === "admin" && (
           <div className="mt-4 p-3 bg-yellow-900 border border-yellow-700 rounded">
             <p className="text-yellow-300 text-sm">

@@ -7,9 +7,8 @@ const router = Router();
 
 router.use(authenticate);
 router.use(authorizeRole("admin"));
-router.use(adminController.requireSuperAdmin); // This should be imported from your controller
+router.use(adminController.requireSuperAdmin); 
 
-// --- Users ---
 router.get(
   "/getAllUsers",
   adminController.getAllUsers
@@ -20,7 +19,6 @@ router.patch(
   adminController.banUser
 );
 
-// --- Jobs ---
 router.get(
   "/getAllJobs",
   adminController.getAllJobs
@@ -31,7 +29,6 @@ router.delete(
   adminController.removeJob
 );
 
-// --- Statistics ---
 router.get(
   "/statistics",
   adminController.getStatistics

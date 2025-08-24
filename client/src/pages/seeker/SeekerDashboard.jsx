@@ -25,7 +25,6 @@ const SeekerDashboard = () => {
         dispatch(fetchProfile());
     }, [dispatch]);
 
-    // Mark alert as shown after displaying once
     useEffect(() => {
         if (!profileLoading && profileExists && !profileComplete && !hasShownIncompleteAlert) {
             const timer = setTimeout(() => {
@@ -47,13 +46,11 @@ const SeekerDashboard = () => {
             <Navbar role="seeker"/>
 
             <div className="max-w-7xl mx-auto p-4">
-                {/* Header Section */}
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold mb-2">Jobs Dashboard</h1>
                     <p className="text-gray-400">Discover your next career opportunity</p>
                 </div>
 
-                {/* Profile Completion Alert */}
                 {shouldShowProfileAlert && (
                     <div className="mb-6 p-4 bg-gradient-to-r from-[#B85042] to-red-700 rounded-lg border-l-4 border-red-500">
                         <div className="flex items-center justify-between">
@@ -90,12 +87,10 @@ const SeekerDashboard = () => {
                     </div>
                 )}
 
-                {/* Filters Section */}
                 <div className="mb-6">
                     <Filters onFilter={handleFilter} />
                 </div>
 
-                {/* Jobs Section */}
                 <div className="mb-4 flex items-center justify-between">
                     <h2 className="text-xl font-semibold">Available Jobs</h2>
                     {jobs.length > 0 && (
