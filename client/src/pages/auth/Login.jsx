@@ -124,19 +124,6 @@ export default function Login() {
           </button>
         </form>
 
-        {/* Quick Admin Login Button (for development/testing) */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mt-4">
-            <button
-              onClick={handleSuperAdminLogin}
-              disabled={loading}
-              className="w-full p-2 rounded bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 text-sm"
-            >
-              Quick Super Admin Login (Dev Only)
-            </button>
-          </div>
-        )}
-
         {/* Admin Login Notice */}
         {formData.role === "admin" && (
           <div className="mt-4 p-3 bg-yellow-900 border border-yellow-700 rounded">
