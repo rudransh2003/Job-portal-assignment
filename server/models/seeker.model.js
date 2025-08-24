@@ -51,6 +51,12 @@ const seekerSchema = new mongoose.Schema(
         },
       },
     ],
+    savedJobs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "job",
+      },
+    ]
   },
   { timestamps: true }
 );

@@ -25,4 +25,19 @@ router.get('/view-jobs',
     authorizeRole("seeker"),
     seekerController.viewJobs)
 
+router.post('/apply/:jobId',
+    authenticate,
+    authorizeRole("seeker"),
+    seekerController.applyToJob)
+
+router.get('/applied-jobs',
+    authenticate,
+    authorizeRole("seeker"),
+    seekerController.getAppliedJobs)
+
+router.post('/save/:jobId',
+    authenticate,
+    authorizeRole("seeker"),
+    seekerController.saveJob)
+
 export default router

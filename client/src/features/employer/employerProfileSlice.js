@@ -1,22 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API = `${import.meta.env.VITE_SERVER_URL}/seeker/profile`;
+const API = `${import.meta.env.VITE_SERVER_URL}/employer/profile`;
 
 // Helper function to check if profile is complete
 const isProfileComplete = (profile) => {
     if (!profile) return false;
     
-    // Check if essential fields are filled
-    const hasSkills = profile.skills && profile.skills.length > 0;
-    const hasExperience = profile.experience && profile.experience.company && profile.experience.role;
-    const hasExperienceYears = profile.experienceYears !== undefined && profile.experienceYears >= 0;
+    // Check if essential fields are filled - matching your Mongoose schema
+    const hasCompanyName = profile.companyName && profile.companyName.trim();
     
-    return hasSkills && hasExperience && hasExperienceYears;
+    return hasCompanyName; // Only companyName is required in your schema
 };
 
-export const fetchProfile = createAsyncThunk(
-  "seeker/fetchProfile",
+export const fetchEmployerProfile = createAsyncThunk(
+  "employer/fetchProfile",
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
@@ -34,9 +32,9 @@ export const fetchProfile = createAsyncThunk(
   }
 );
 
-// Create profile
-export const createProfile = createAsyncThunk(
-  "seeker/createProfile",
+// Create employer profile
+export const createEmployerProfile = createAsyncThunk(
+  "employer/createProfile",
   async (profileData, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
@@ -50,9 +48,9 @@ export const createProfile = createAsyncThunk(
   }
 );
 
-// Update profile
-export const updateProfile = createAsyncThunk(
-  "seeker/updateProfile",
+// Update employer profile
+export const updateEmployerProfile = createAsyncThunk(
+  "employer/updateProfile",
   async (profileData, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
@@ -66,96 +64,75 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
-const seekerProfileSlice = createSlice({
-  name: "seekerProfile",
+const employerProfileSlice = createSlice({
+  name: "employerProfile",
   initialState: {
     profile: null,
     loading: false,
     error: null,
     profileExists: false,
-    profileComplete: false,
-    hasShownIncompleteAlert: false, // Track if we've already shown the alert for incomplete profile
+    profileComplete: null, // Changed from false to null - indicates "unknown" state
   },
   reducers: {
     clearError: (state) => {
       state.error = null;
     },
-    markAlertAsShown: (state) => {
-      state.hasShownIncompleteAlert = true;
-    },
   },
   extraReducers: (builder) => {
     builder
       // Fetch profile
-      .addCase(fetchProfile.pending, (state) => { 
+      .addCase(fetchEmployerProfile.pending, (state) => { 
         state.loading = true; 
         state.error = null;
       })
-      .addCase(fetchProfile.fulfilled, (state, action) => { 
+      .addCase(fetchEmployerProfile.fulfilled, (state, action) => { 
         state.loading = false; 
         state.profile = action.payload;
         state.profileExists = action.payload !== null;
-        const previouslyComplete = state.profileComplete;
         state.profileComplete = isProfileComplete(action.payload);
         state.error = null;
-        
-        if (state.profileComplete !== previouslyComplete) {
-          state.hasShownIncompleteAlert = false;
-        }
       })
-      .addCase(fetchProfile.rejected, (state, action) => { 
+      .addCase(fetchEmployerProfile.rejected, (state, action) => { 
         state.loading = false; 
         state.error = action.payload;
         state.profileExists = false;
-        state.profileComplete = false;
+        state.profileComplete = false; // Only set to false when there's an actual error
       })
       
       // Create profile
-      .addCase(createProfile.pending, (state) => { 
+      .addCase(createEmployerProfile.pending, (state) => { 
         state.loading = true; 
         state.error = null;
       })
-      .addCase(createProfile.fulfilled, (state, action) => { 
+      .addCase(createEmployerProfile.fulfilled, (state, action) => { 
         state.loading = false; 
         state.profile = action.payload;
         state.profileExists = true;
-        const previouslyComplete = state.profileComplete;
         state.profileComplete = isProfileComplete(action.payload);
         state.error = null;
-        
-        // Reset alert flag when profile becomes complete or if it was complete and now incomplete
-        if (state.profileComplete || (previouslyComplete && !state.profileComplete)) {
-          state.hasShownIncompleteAlert = false;
-        }
       })
-      .addCase(createProfile.rejected, (state, action) => { 
+      .addCase(createEmployerProfile.rejected, (state, action) => { 
         state.loading = false; 
         state.error = action.payload;
       })
       
       // Update profile
-      .addCase(updateProfile.pending, (state) => { 
+      .addCase(updateEmployerProfile.pending, (state) => { 
         state.loading = true; 
         state.error = null;
       })
-      .addCase(updateProfile.fulfilled, (state, action) => { 
+      .addCase(updateEmployerProfile.fulfilled, (state, action) => { 
         state.loading = false; 
         state.profile = action.payload;
-        const previouslyComplete = state.profileComplete;
         state.profileComplete = isProfileComplete(action.payload);
         state.error = null;
-        
-        // Reset alert flag when profile becomes complete or if it was complete and now incomplete
-        if (state.profileComplete || (previouslyComplete && !state.profileComplete)) {
-          state.hasShownIncompleteAlert = false;
-        }
       })
-      .addCase(updateProfile.rejected, (state, action) => { 
+      .addCase(updateEmployerProfile.rejected, (state, action) => { 
         state.loading = false; 
         state.error = action.payload;
       });
   },
 });
 
-export const { clearError, markAlertAsShown } = seekerProfileSlice.actions;
-export default seekerProfileSlice.reducer;
+export const { clearError } = employerProfileSlice.actions;
+export default employerProfileSlice.reducer;

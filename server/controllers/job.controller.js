@@ -34,7 +34,7 @@ export const getEmployerJobs = async (req, res) => {
 
 export const updateJob = async (req, res) => {
     try {
-        console.log("Update Body:", req.body);  // debug log
+        console.log("Update Body:", req.body);
 
         const { jobId } = req.params;
         const job = await jobModel.findByIdAndUpdate(
@@ -60,6 +60,60 @@ export const deleteJob = async (req, res) => {
             $pull: { postedJobs: job._id },
         });
         res.status(200).json({ message: "Job deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getApplicantsForJob = async (req, res) => {
+    try {
+      const { jobId } = req.params;
+      const job1 = await jobModel.findById(jobId).populate("applications.seekerId");
+      // Does this return a full seeker document?
+      console.log(job1.applications[0].seekerId); 
+      
+      const job = await jobModel.findById(jobId)
+        .populate({
+          path: "applications.seekerId",
+          // The 'model' property is optional but can help Mongoose be explicit
+          model: "seeker", 
+          populate: {
+            path: "userId",
+            model: "user",
+            // Select the fields you need from the 'user' model
+            select: "name email phone", 
+          },
+        });
+  
+      if (!job) {
+        return res.status(404).json({ message: "Job not found" });
+      }
+  
+      // Send the entire 'applications' array, which should now be populated
+      res.json(job.applications); 
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server error" });
+    }
+  };
+  
+
+export const updateApplicationStatus = async (req, res) => {
+    try {
+        const { jobId, seekerId } = req.params;
+        const { status } = req.body; // accepted / rejected / under_review
+
+        const job = await jobModel.findOneAndUpdate(
+            { _id: jobId, "applications.seekerId": seekerId },
+            { $set: { "applications.$.status": status } },
+            { new: true }
+        ).populate("applications.seekerId", "name email");
+
+        if (!job) {
+            return res.status(404).json({ message: "Application not found" });
+        }
+
+        res.status(200).json({ message: "Status updated", job });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

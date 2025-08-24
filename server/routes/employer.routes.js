@@ -12,11 +12,14 @@ router.post('/profile',
 
 router.get("/profile", authenticate, authorizeRole("employer"), employerController.getProfile);
 router.put("/profile", authenticate, authorizeRole("employer"), employerController.updateProfile);
-router.put("/profile", authenticate, authorizeRole("employer"), employerController.updateProfile);
 
 router.post("/create-job", authenticate, authorizeRole("employer"), jobController.createJob);
 router.get("/my-jobs", authenticate, authorizeRole("employer"), jobController.getEmployerJobs);
 router.put("/update-job/:jobId", authenticate, authorizeRole("employer"), jobController.updateJob);
 router.delete("/delete-job/:jobId", authenticate, authorizeRole("employer"), jobController.deleteJob)
 
+router.get("/:jobId/applicants", authenticate, authorizeRole("employer"), jobController.getApplicantsForJob)
+router.put("/:jobId/applicants/:seekerId/status",authenticate,
+    authorizeRole("employer"),
+    jobController.updateApplicationStatus)
 export default router

@@ -23,7 +23,7 @@ export default function Login() {
       if (res.meta.requestStatus === "fulfilled") {
         const role = res.payload.user.role;
         if (role === "admin") navigate("/admin/dashboard");
-        else if (role === "employer") navigate("/employer/dashboard");
+        else if (role === "employer") navigate("/employer/view-jobs");
         else navigate("/seeker/view-jobs");
       }
     });
