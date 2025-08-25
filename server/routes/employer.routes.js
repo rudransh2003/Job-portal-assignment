@@ -4,22 +4,19 @@ import { authorizeRole } from '../middlewares/role.middleware.js';
 import * as employerController from '../controllers/employer.controllers.js'
 import * as jobController from '../controllers/job.controller.js'
 const router = Router()
+router.use(authenticate)
+router.use(authorizeRole("employer"));
 
-router.post('/profile',
-    authenticate,
-    authorizeRole("employer"),
-    employerController.createProfile)
+router.post('/profile',employerController.createProfile)
+router.get("/profile", employerController.getProfile);
+router.put("/profile", employerController.updateProfile);
 
-router.get("/profile", authenticate, authorizeRole("employer"), employerController.getProfile);
-router.put("/profile", authenticate, authorizeRole("employer"), employerController.updateProfile);
+router.post("/create-job", jobController.createJob);
+router.get("/my-jobs", jobController.getEmployerJobs);
+router.put("/update-job/:jobId", jobController.updateJob);
+router.delete("/delete-job/:jobId", jobController.deleteJob)
 
-router.post("/create-job", authenticate, authorizeRole("employer"), jobController.createJob);
-router.get("/my-jobs", authenticate, authorizeRole("employer"), jobController.getEmployerJobs);
-router.put("/update-job/:jobId", authenticate, authorizeRole("employer"), jobController.updateJob);
-router.delete("/delete-job/:jobId", authenticate, authorizeRole("employer"), jobController.deleteJob)
+router.get("/:jobId/applicants", jobController.getApplicantsForJob)
+router.put("/:jobId/applicants/:seekerId/status", jobController.updateApplicationStatus)
 
-router.get("/:jobId/applicants", authenticate, authorizeRole("employer"), jobController.getApplicantsForJob)
-router.put("/:jobId/applicants/:seekerId/status",authenticate,
-    authorizeRole("employer"),
-    jobController.updateApplicationStatus)
 export default router

@@ -30,9 +30,11 @@ const ApplicationsPage = () => {
     setOpenJobId((prev) => (prev === jobId ? null : jobId));
   };
 
-  const handleUpdateStatus = (jobId, seekerId, status) => {
-    dispatch(updateApplicantStatus({ jobId, seekerId, status }));
+  const handleUpdateStatus = async (jobId, seekerId, status) => {
+    await dispatch(updateApplicantStatus({ jobId, seekerId, status }));
+    dispatch(fetchApplicantsForJob(jobId));
   };
+  
 
   if (loading && !jobs.length) {
     return (

@@ -1,6 +1,6 @@
 export const navConfig = {
   seeker: {
-    title: "Seeker",
+    title: "Job Seeker",
     items: [
       { id: "dashboard", label: "Dashboard", path: "/seeker/view-jobs", icon: "🏠" },
       { id: "profile", label: "My Profile", path: "/seeker/profile", icon: "👤" },
